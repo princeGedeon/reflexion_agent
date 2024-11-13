@@ -13,6 +13,8 @@ isort = "^5.13.2"
 langchain = "^0.3.7"
 langgraph = "^0.2.46"
 langchain-openai = "^0.2.8"
+grandalf = "^0.8"
+langsmith = "^0.1.143"
 
 
 [build-system]
