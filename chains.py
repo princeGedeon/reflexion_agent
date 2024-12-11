@@ -7,7 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
-from schema import AnswerQuestion
+from schema import AnswerQuestion, ReviseAnswer
 
 load_dotenv()
 
@@ -30,7 +30,7 @@ actor_prompt_template=ChatPromptTemplate.from_messages(
 )
 
 llm=ChatOpenAI()
-parser=JsonOutputToolsParser(return_id=True)
+
 parser_pydantic=PydanticToolsParser(tools=[AnswerQuestion])
 actor_chain= actor_prompt_template | llm
 
@@ -40,6 +40,19 @@ first_reponder_prompt_template=actor_prompt_template.partial(
 
 first_responder=first_reponder_prompt_template | llm.bind_tools(
     tools=[AnswerQuestion],tool_choice="AnswerQuestion"
+)
+
+revise_instructions = """
+- Révisez votre réponse précédente en utilisant les nouvelles informations.
+- Vous DEVEZ inclure des citations numériques dans votre réponse révisée pour garantir qu'elle puisse être vérifiée.
+- Ajoutez une section "Références" en bas de votre réponse (qui ne compte pas dans la limite de mots).
+    [1] https://example.com
+    [2] https://example.com
+- Vous devez utiliser la critique précédente pour supprimer les informations superflues de votre réponse.
+"""
+
+revisor=actor_prompt_template.partial(first_instruction=revise_instructions) | llm.bind_tools(
+    tools=[ReviseAnswer],tool_choice="ReviseAnswer"
 )
 
 if __name__=="__main__":

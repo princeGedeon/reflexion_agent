@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel, Field
+from langchain_core.pydantic_v1 import BaseModel,Field
 
 
 class Reflection(BaseModel):
@@ -13,4 +13,10 @@ class AnswerQuestion(BaseModel):
     reflection: Reflection=Field(description="Ta reflexion par rapport à la reponse initial")
     search_queries:List[str]=Field(
 description="1-4 requête de recherche pour améliorer face au critique de ta réponse actuelle"
+    )
+
+class ReviseAnswer(AnswerQuestion):
+    """Revise ta réponse """
+    references:List[str]=Field(
+        description="Citation qui ont motivé le changement de la réponse"
     )
